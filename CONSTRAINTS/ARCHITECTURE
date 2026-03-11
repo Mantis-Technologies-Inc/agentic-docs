@@ -1,0 +1,76 @@
+# CONSTRAINTS_ARCHITECTURE.md
+
+**Version:** 1.0 | **Last Updated:** March 2026 | **Owner:** CEO + CTO
+**Load this file:** Every `/plan`, `/explore`, and `/execute` session. Any task touching infrastructure, deployment, framework, or stack decisions.
+
+These are locked architectural decisions. Do not propose alternatives, migrations, or exceptions without explicit CEO sign-off.
+
+---
+
+## Database: Supabase
+
+- Supabase is the primary database. All persistent data lives here.
+- Use Supabase Auth for all authentication — do not introduce a separate auth layer.
+- Use Supabase Row Level Security (RLS) for all data access control. Every table touching user or organization data must have RLS policies defined before shipping.
+- Use Supabase Realtime only where genuinely necessary (fleet status updates, live readiness dashboards). Do not use it for polling patterns that could be simple REST calls.
+- Schema migrations must be written as versioned SQL files committed to the repo. Never apply schema changes directly in the Supabase dashboard without a corresponding migration file.
+
+---
+
+## Backend Deployment: Railway
+
+- Railway is the deployment platform for all backend services (FastAPI, workers, automation services).
+- Environment variables live in Railway — never hardcoded, never in `.env` files committed to the repo.
+- Maintain at minimum 3 environments: `dev`, `stg`, `prd`. No direct pushes to production without staging validation.
+- Services must be stateless where possible. State belongs in Supabase, not in Railway service memory.
+
+---
+
+## Frontend Deployment: Vercel
+
+- Vercel hosts the web application UI (Next.js / React frontend).
+- All frontend deployments are handled through Vercel projects connected to GitHub.
+- Deployments occur automatically from Git branches — preview deployments for PRs, production from `main`.
+- Environment variables are managed in Vercel project settings. Never committed to the repository.
+- Static assets and UI rendering must leverage Vercel's CDN and edge network.
+
+---
+
+## Frontend Framework: React / Next.js / Expo
+
+- React is the core frontend framework.
+- Next.js is used for the web application UI.
+- Expo (React Native) is used for the mobile application.
+- Do not introduce alternative frameworks (Svelte, Vue, Remix, etc.) without a deliberate architectural decision and CEO sign-off.
+- Component library and design system decisions are anchored to Figma. Do not introduce UI component libraries that conflict with the established design system.
+- Mobile experience is a first-class requirement. All UI work must be responsive and tested at mobile viewport sizes. The warfighter persona requires edge-accessible mobile UX — this is non-negotiable.
+
+---
+
+## Development Process
+
+- No direct commits to `main`. All changes via pull request, reviewed before merge.
+- No schema changes without migrations. See Supabase section above.
+- Staging before production. Every change deploys to staging first.
+- Feature flags for incomplete work. Partially built features ship behind a flag — not as half-finished UI in production.
+- Document decisions, not just code. When a non-obvious architectural or product decision is made, write a one-paragraph decision record in the relevant Linear issue or a `/docs/decisions/` file in the repo.
+
+---
+
+## Developer Authorization
+
+**Authorized without review:**
+- Implement features scoped in Linear issues with acceptance criteria
+- Write and modify frontend components within the established design system
+- Write API routes and database queries following established patterns
+- Write tests for their own work
+- Raise architectural questions or flag concerns in Linear comments
+
+**Not authorized without CEO/lead review:**
+- Modify Supabase RLS policies
+- Change authentication flows
+- Add new third-party dependencies
+- Modify Railway environment configuration
+- Access production data directly
+- Make schema changes outside the migration process
+- Change API versioning or break existing API contracts
