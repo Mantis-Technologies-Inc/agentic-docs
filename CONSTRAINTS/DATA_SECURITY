@@ -1,0 +1,74 @@
+# CONSTRAINTS_DATA_SECURITY.md
+
+**Version:** 1.0 | **Last Updated:** March 2026 | **Owner:** CEO + CTO
+**Load this file:** Every `/execute` and `/review` session. Any task touching auth, data access, logging, APIs, or anything that could interact with warfighter or OEM data.
+
+These are non-negotiable security rules. Apply to every AI session, every contractor, and every code review.
+
+---
+
+## Logging Rules
+
+- No PII in logs. Ever. No user names, email addresses, unit identifiers, or location data in application logs.
+- No sensitive operational data in URL parameters or query strings. Asset IDs, mission data, and unit identifiers must be handled server-side or in request bodies.
+
+---
+
+## Secrets & Keys
+
+- API keys and secrets never in the codebase.
+- Use Railway environment variables for backend secrets. Use Vercel project settings for frontend environment variables.
+- Rotate any key that is accidentally committed immediately — treat as a security incident.
+- Supabase service role keys must never be exposed to the frontend. Frontend applications may only use the public anon key.
+- Session tokens must be transmitted via secure HTTPS requests only.
+- All internal data identifiers are UUIDs. Sequential or human-readable IDs must not be used as primary identifiers — they create enumeration and security risks.
+
+---
+
+## Authentication
+
+- Supabase Auth is the single source of truth for user identity and session management.
+- No parallel or custom authentication systems may be introduced without explicit architectural approval.
+- Authentication is handled using JWT access tokens issued by Supabase.
+- Backend services (FastAPI / GraphQL) must validate Supabase JWTs on every authenticated request.
+- User identity is referenced internally using the Supabase `auth.uid()` UUID — this is the canonical user identifier across the entire system.
+- Every authenticated user corresponds to a Supabase `auth.users` record. Application-level user metadata lives in a separate `UserProfile` table keyed by the Supabase UUID.
+
+---
+
+## Authorization & Data Access
+
+- Authentication establishes identity. Authorization is enforced at the database layer using Supabase RLS.
+- All user-scoped or organization-scoped tables must include RLS policies referencing `auth.uid()`.
+- Backend services must not bypass RLS using service role keys except for explicit administrative or system workflows — and those exceptions must be documented.
+
+---
+
+## Warfighter Data Anonymization
+
+- Any data flowing from warfighter deployments back to OEMs must be anonymized before transmission.
+- Minimum anonymization floor: no GPS coordinates, no unit identifiers, no mission identifiers, no operator identities.
+- Only performance and telemetry signals relevant to the system's design and maintenance may flow to OEMs.
+- This bar may rise as warfighter pilots begin. Treat the above as a floor, not a ceiling.
+- Flag any customer conversation where classification requirements come up to the CEO immediately.
+
+---
+
+## Data Classification (Current State)
+
+The current Railway/Supabase stack is commercial cloud infrastructure. This is appropriate for the OEM commercial product.
+
+**Rules in effect now:**
+- No PII in logs
+- No sensitive operational data in URL parameters
+- Secrets in environment variables only
+- Warfighter-to-OEM data anonymized per rules above
+
+**Pre-pilot blocker (not current):** Before warfighter pilots begin, determine what data classification level DoD operational data will carry and whether it can legally reside on commercial cloud. This decision must happen before any warfighter pilot contract is signed.
+
+---
+
+## ⚠️ Open Items (Blockers for Warfighter Pilot)
+
+- **CAC/PIV Auth:** Current Supabase Auth is appropriate for OEM commercial product. Warfighter use case may require CAC/PIV integration, SSO with DoD identity providers, or IL-compliant auth flows. Must be scoped before warfighter pilot begins.
+- **Cached Data Policies:** Not yet defined. Must be resolved before warfighter pilot begins.
