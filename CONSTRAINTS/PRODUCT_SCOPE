@@ -1,0 +1,80 @@
+# CONSTRAINTS_PRODUCT_SCOPE.md
+
+**Version:** 1.0 | **Last Updated:** March 2026 | **Owner:** CEO
+**Load this file:** Every `/create-issue` and `/plan` session. Any feature scoping, PRD writing, or product decision task. Load alongside MANTIS_CONTEXT.md.
+
+These are declarative product scope rules. Apply them before writing a single line of code or scoping a single feature. If a proposed feature conflicts with any rule below, stop and flag it — do not proceed without CEO decision.
+
+---
+
+## What Mantis IS
+
+- An agentic logistics platform for unmanned and autonomous systems (UxS).
+- Delivers: fleet readiness, predictive maintenance, parts forecasting, inventory optimization, asset and operator performance intelligence.
+- Serves two segments: UxS OEMs (now) and warfighter units (following OEM traction).
+- The durable value: a two-sided marketplace where OEMs receive anonymized field performance data and warfighters receive faster system improvements. This feedback loop is the moat.
+
+---
+
+## What Mantis IS NOT — Hard Stops
+
+These are architectural and strategic constraints. Do not scope, prototype, or implement anything in these categories without an explicit CEO decision.
+
+**Not for manned platforms.**
+Mantis is exclusively for unmanned and autonomous systems. No manned platforms, legacy equipment, commercial aviation, or non-UxS asset classes. If a feature does not serve a UxS fleet, it is out of scope.
+
+**Not a C2 system.**
+Mantis does not direct systems. It keeps systems ready. C2 belongs to Anduril Lattice and Palantir. Do not blur this line. Any feature that directs, commands, or controls a UxS asset is out of scope.
+
+**Not a production lifecycle tool for OEMs.**
+Mantis does not manage pre-shipment build, test, or manufacturing workflows. OEM scope is post-production fleet management and the data feedback loop — not factory-floor or QA tooling.
+
+**Not a single-OEM tool.**
+No deep integrations that lock to one vendor ecosystem. Vendor-agnostic data normalization is non-negotiable. If a feature only works for one OEM's data format or SDK, it is not a Mantis feature.
+
+**Not a dashboard-only tool.**
+Existing tools display data. Mantis acts on it. Features that only show information without enabling or automating action are lower priority. Every feature should move toward agentic sustainment workflows, not static reporting.
+
+**Not consumer or commercial (now).**
+All resources target the DoD mission. Commercial UxS expansion is a future bet, not a current one.
+
+---
+
+## Non-Negotiable Product Principles
+
+Apply these to every feature decision, not just technical ones.
+
+**Vendor-agnostic always.**
+No feature should require a specific OEM's data format, SDK, or integration to function. If it only works for one vendor, it is not a Mantis feature.
+
+**Mobile-first for warfighter features.**
+Any UI destined for the field must be designed for mobile first, desktop second. The warfighter user requires edge-accessible UX in low-connectivity environments.
+
+**Agentic, not analytical.**
+Mantis acts on data — it does not just display it. Features that only surface information without enabling or automating action are lower priority than features that close a loop.
+
+**The feedback loop is sacred.**
+Any feature that compromises the anonymized, bidirectional data flow between OEMs and warfighters is a non-starter. This is the moat. Protect it in every design decision.
+
+**Clarity over cleverness.**
+The warfighter user has zero patience for ambiguous UI. Every interface must answer one question clearly: "What do I need to do right now?" If the UI requires interpretation, it is not ready for the field.
+
+---
+
+## The North Star Test
+
+Before building, scoping, or prioritizing anything, run it through this filter:
+
+> *"Does this move a UxS system closer to being ready — to deliver, to deploy, or to fight — and does it generate signal that makes the next system better?"*
+
+Both halves must pass. If either fails, it is not Mantis.
+
+**For warfighter features only**, apply the secondary test:
+> *"Does this answer one question clearly — 'what do I need to do right now?'"*
+If the UI requires interpretation, it is not ready for the field.
+
+---
+
+## No Ship Without Acceptance Criteria
+
+Every Linear issue must have explicit acceptance criteria before development begins. "Done" means the criteria are met — not that code is written.
