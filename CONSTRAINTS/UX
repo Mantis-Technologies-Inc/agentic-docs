@@ -1,0 +1,66 @@
+# CONSTRAINTS_UX.md
+
+**Version:** 1.2 | **Last Updated:** March 2026 | **Owner:** CEO
+**Load this file:** Any task involving UI design, frontend components, OEM or warfighter-facing features, or any product surface decision. Load alongside CONSTRAINTS_PRODUCT_SCOPE.md for all UX work.
+
+---
+
+## Surface Priority (Read This First)
+
+Mantis has three distinct product surfaces. They must be treated as separate design contexts — do not conflate patterns across them.
+
+**Build order:**
+1. **OEM experience** — Primary use case today. All current UI work is OEM-first.
+2. **Warfighter desktop experience** — Next. Desktop fleet management for UxS Program Leads.
+3. **Warfighter edge device experience** — Future. Do not scope or build until warfighter desktop is validated.
+
+If a task does not specify which surface it targets, assume OEM. Ask before assuming warfighter.
+
+---
+
+## OEM UX (Primary — Build This Now)
+
+OEM users are engineers and program managers building and validating UxS systems. They work in offices and labs with reliable connectivity and are accustomed to data-rich professional software.
+
+- **Desktop-primary.** All OEM UI is designed for desktop first. This is the primary form factor for every current sprint.
+- **Data density is appropriate.** OEM users handle complex fleet and program data. Denser, information-rich UI is acceptable — clarity and scannability still matter.
+- **Two personas, two needs.** Engineers (Persona A) need per-asset detail and issue resolution workflows. Program managers (Persona B) need fleet-level status and delivery confidence at a glance. Design for both — do not collapse them into one view.
+- **Program-level visibility first.** Lead with fleet-level status. Asset-level detail is a drill-down, not the entry point.
+- **No field-UX constraints.** OEM users are not in low-connectivity environments. Standard web app patterns apply.
+- **Agentic.** Surfaces that only display data without enabling action are lower priority. Every primary view should surface a clear recommended action.
+
+---
+
+## Warfighter UX — Desktop Form Factor (Secondary — Do Not Prioritize Until OEM Is Validated)
+
+The first warfighter persona is the **UxS Program Lead** (Persona D) — responsible for fleet readiness across assigned systems and units. They work from a fixed command or operations environment with reliable connectivity. They are likely experienced with MRO software and other logistics and maintenance tools.
+
+- **Desktop-primary.** Design warfighter fleet management UI for desktop. This user is not in the field — they manage the field from a fixed location.
+- **Familiar mental models.** This user has MRO software experience. Leverage familiar patterns — do not over-simplify. They can handle data density similar to OEM users.
+- **Fleet-level visibility first.** Primary view is fleet readiness across assigned systems. Unit-level and asset-level detail are drill-downs.
+- **One question, one answer.** Every screen must answer clearly: *"What does my fleet need right now?"* Status, priority, and required action must be immediately scannable.
+- **No ambiguity.** Status indicators and action prompts must be unambiguous. Color alone is not sufficient — use iconography and text together.
+- **Agentic.** Every primary view should surface a clear recommended action, not just a status report.
+- **Shared surface patterns with OEM where appropriate.** The warfighter desktop experience may share UI components and layout patterns with the OEM experience — the data model and permissions differ, but the interaction paradigm is similar. Do not build a completely separate design system for warfighter desktop unless the use case demands it.
+
+---
+
+## Warfighter UX — Edge Device Form Factor (Future — Do Not Build Now)
+
+The edge device form factor (e.g. ATAK plugin or equivalent) serves operators in the field — Persona C (Individual UxS Operator). This is a fundamentally different design problem from both the OEM and warfighter desktop experiences.
+
+- **Do not build this now.** Do not scope, prototype, or design edge device UI until the warfighter desktop experience is validated in a pilot.
+- **When eventually scoped:** Treat as a completely separate design context. Do not port or adapt the desktop experience — start from field constraints.
+- **Low-connectivity by default.** Assume degraded or intermittent network. UI must function at the edge with minimal input.
+- **One action per screen.** The operator in the field has one question: *"What do I need to do right now?"* If the screen requires interpretation, it is not ready for the field.
+- **Offline-tolerant.** Issue reporting, asset status, and readiness logging must work without a live connection. Sync when connection is restored.
+- **ATAK integration patterns.** If the form factor uses ATAK, follow ATAK plugin UX conventions. Do not impose web app patterns on a tactical device context.
+
+---
+
+## Shared UX Principles (All Surfaces)
+
+- **Design system anchored to Figma.** Do not introduce UI component libraries that conflict with the established Figma design system. All new components are designed in Figma first.
+- **Responsive always.** All screens must be tested at mobile viewport sizes. Do not ship UI that breaks on mobile, even for desktop-primary surfaces.
+- **Accessibility.** Color alone cannot convey status. Use iconography and text together. WCAG AA compliance is the baseline.
+- **Agentic over analytical.** Across all surfaces, features that enable action are higher priority than features that only display information.
