@@ -1,0 +1,42 @@
+# CONSTRAINTS_INDEX.md
+
+**Version:** 1.0 | **Last Updated:** March 2026 | **Owner:** CEO + CTO
+**Load this file first** in any session that requires constraint awareness. Use it to determine which specific constraint files to load for the task at hand. Do not load all constraint files simultaneously — load only what the task requires.
+
+---
+
+## Constraint Files & When to Load Them
+
+| File | Load When |
+|---|---|
+| `CONSTRAINTS_ARCHITECTURE.md` | Any task touching infrastructure, deployment, framework, stack, or database decisions |
+| `CONSTRAINTS_DATA_SECURITY.md` | Any task touching auth, logging, secrets, API keys, warfighter data, or PII |
+| `CONSTRAINTS_DATA_ACCESS.md` | Any task involving multi-tenancy, RLS policies, OEM data feeds, telemetry ingestion, or the feedback loop |
+| `CONSTRAINTS_API_INTEGRATIONS.md` | Any task involving API design, external integrations, OEM data ingestion, or webhooks |
+| `CONSTRAINTS_PRODUCT_SCOPE.md` | Any feature scoping, PRD writing, issue creation, or product decision |
+| `CONSTRAINTS_UX.md` | Any task involving UI design, frontend components, warfighter features, or mobile experience |
+
+---
+
+## Slash Command Load Map
+
+Use this table to determine which constraint files to load per Cursor slash command:
+
+| Command | Load These Files |
+|---|---|
+| `/create-issue` | `CONSTRAINTS_PRODUCT_SCOPE.md` |
+| `/explore` | `CONSTRAINTS_ARCHITECTURE.md` |
+| `/plan` | `CONSTRAINTS_ARCHITECTURE.md` + `CONSTRAINTS_PRODUCT_SCOPE.md` |
+| `/execute` | `CONSTRAINTS_ARCHITECTURE.md` + `CONSTRAINTS_DATA_SECURITY.md` + `CONSTRAINTS_DATA_ACCESS.md` + `CONSTRAINTS_API_INTEGRATIONS.md` (load UX and others if feature touches those domains) |
+| `/review` | All constraint files |
+| `/doc-update` | `CONSTRAINTS_PRODUCT_SCOPE.md` |
+
+---
+
+## Open Items (Warfighter Pilot Blockers)
+
+These must be resolved before any warfighter pilot contract is signed:
+
+- [ ] **CAC/PIV Auth** — Current Supabase Auth is appropriate for OEM product only. Warfighter pilot may require CAC/PIV, DoD SSO, or IL-compliant auth. Must be scoped before pilot begins. See `CONSTRAINTS_DATA_SECURITY.md`.
+- [ ] **Data Classification** — Determine what classification level DoD operational data carries and whether it can legally reside on commercial cloud. See `CONSTRAINTS_DATA_SECURITY.md`.
+- [ ] **Cached Data Policies** — Not yet defined. Must be resolved before warfighter pilot. See `CONSTRAINTS_DATA_SECURITY.md`.
