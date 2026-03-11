@@ -1,0 +1,56 @@
+# CONSTRAINTS_DATA_ACCESS.md
+
+**Version:** 1.0 | **Last Updated:** March 2026 | **Owner:** CEO + CTO
+**Load this file:** Any task involving multi-tenancy, data visibility, RLS policies, OEM data feeds, warfighter data, or the feedback loop. Load alongside CONSTRAINTS_DATA_SECURITY.md for any data-related work.
+
+Mantis is not standard SaaS multi-tenancy. There are two distinct user sides with fundamentally different visibility rules. These are non-negotiable and must be enforced at the database level via Supabase RLS on every relevant table.
+
+---
+
+## OEM Side Rules
+
+- Each OEM sees only data for their own systems and assets. GreenSight sees GreenSight data. Parrot sees Parrot data. No cross-OEM visibility under any circumstances.
+- OEMs receive anonymized performance insights derived from warfighter field use of their specific products only.
+- OEMs do not receive insights about competitor products or aggregate fleet data across other OEMs.
+- Anonymization of warfighter feedback to OEMs is required: no GPS coordinates, no unit identifiers, no operator identities. Only performance and telemetry signals relevant to the system's design and maintenance.
+
+---
+
+## Warfighter Side Rules
+
+- Individual operators see their own assets and unit only.
+- UxS Program Leads see fleet readiness and performance across their assigned systems and unit.
+- Warfighter Leadership gets aggregated readiness and performance views — rolled up to service branch level (Army, Navy, SOCOM, etc.). This is a summary view, not raw operational data.
+- Warfighters do not see other units' operational details — only their own data plus the aggregate roll-up appropriate to their rank and role.
+
+---
+
+## The Feedback Loop Data Rule
+
+**OEM → Warfighter:** Product performance insights, predictive maintenance signals, parts forecasting — tied to that OEM's specific systems only.
+
+**Warfighter → OEM:** Anonymized field performance data — no GPS, no unit IDs, no operator data. Stripped to system-level telemetry and performance signals only.
+
+---
+
+## RLS Implementation Requirement
+
+Every table that stores or derives asset, mission, telemetry, operational, or OEM-scoped data must have RLS policies defined and reviewed before shipping.
+
+This includes:
+- Base tables
+- Join tables
+- Materialized views
+- Derived datasets
+
+No exceptions. Any new table that touches user or organization data ships with RLS policies or it does not ship.
+
+---
+
+## Asset Identity & Telemetry Ingestion Rules
+
+- **Asset creation is telemetry-first.** A UxS asset is not fully instantiated in the Mantis fleet until at least one piece of timeboxed telemetry data has been ingested and associated with it. Manual asset creation alone produces a "pending" asset — visible in the fleet but clearly flagged as unverified.
+- **Physical and digital identifiers are not assumed to match.** The serial number on a physical asset may differ from the unique identifier in its telemetry stream. Every ingestion event must pass through an identity resolution layer before being associated with a fleet asset.
+- **Identity resolution is user-confirmed on first match, then permanent.** When a new digital identifier arrives via telemetry, surface it to the user for reconciliation. Once confirmed, store the physical-to-digital mapping permanently — all future telemetry from that ID auto-resolves without user intervention.
+- **All ingestion paths use the same resolution layer.** Manual CSV/JSON uploads and native OEM API integrations must both flow through the same identity resolution logic. No parallel ingestion paths that bypass reconciliation.
+- **Pending assets are a valid state, not a bug.** Customers may add assets that have no telemetry yet. These exist in a distinct "pending" state. The UI must clearly distinguish telemetry-verified assets from pending ones at all times.
