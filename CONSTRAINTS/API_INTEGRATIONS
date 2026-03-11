@@ -1,0 +1,38 @@
+# CONSTRAINTS_API_INTEGRATIONS.md
+
+**Version:** 1.0 | **Last Updated:** March 2026 | **Owner:** CEO + CTO
+**Load this file:** Any task involving API design, external integrations, OEM data ingestion, webhooks, or third-party service connections.
+
+---
+
+## API Versioning
+
+- All external-facing APIs must be versioned from day one.
+- REST endpoints use a `/v1/` prefix.
+- GraphQL APIs are exposed under `/v1/graphql`.
+- Breaking changes require a new version — not in-place modification of existing endpoints.
+- Do not break existing API contracts without a versioned migration path.
+
+---
+
+## OEM Telemetry Ingestion
+
+- OEM telemetry ingestion endpoints must accept a normalized schema. Do not build vendor-specific ingestion pipelines. The normalization layer is Mantis's job, not the OEM's.
+- This is a core architectural principle: vendor-agnostic data normalization is the moat. Any ingestion path that requires OEM-specific handling on Mantis's side violates this constraint.
+- All ingestion paths — manual CSV/JSON uploads and native OEM API integrations — must flow through the same identity resolution logic. No parallel ingestion paths that bypass reconciliation.
+
+---
+
+## Webhooks
+
+- Webhook payloads must be validated and idempotent.
+- Duplicate deliveries must not create duplicate records.
+- Webhook endpoints must validate payload signatures before processing.
+
+---
+
+## External Access Rules
+
+- No direct database access for contractors or external integrations. All external access goes through API endpoints.
+- Third-party integrations (n8n automations, future OEM data feeds) must use service accounts with minimum necessary permissions — not personal credentials, not admin-level access.
+- New third-party dependencies must be discussed and approved before introduction. Do not add packages or services unilaterally.
